@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>SAT results Data</title>
+</head>
+<body>
+    <div>
+        <canvas id="tempChart"></canvas>
+    </div>
+
+    <script>
+    async function getData() {
+        const response = await fetch("SAT_Results.csv");
+        const data = await response.text();
+        const rows = data.split("\n").slice(1);
+        const labels = [];
+        const values = [];
+        
+        rows.forEach((elem) => {
+            const row = elem.split(",");
+            const school = row[1];
+            const SAT = parseFloat(row[3]) +parseFloat(row[4]) ;
+
+            labels.push(school);
+            values.push(SAT);
+        });
+
+        return {labels, values};
+    }
+
+    async function createChart() {
+        const {labels, values} = await getData();
+        const ctx = document.getElementById('tempChart')
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Average SAT Scores',
+                    data: values,
+                    borderWidth: 1,
+                    borderColor: 'blue',
+                    pointRadius: 2
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '2012 SAT Scores',
+                        font: {
+                            size: 30
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                    }
+                }
+            }
+        })
+    }
+
+    createChart();
+    </script>
+</body>
+</html>
